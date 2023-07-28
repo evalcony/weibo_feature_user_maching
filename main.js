@@ -12,17 +12,14 @@
 (function() {
     'use strict';
 
-    // Your code here...
+    // 这里填写要匹配的用户名，以英文逗号分隔
+    // 例如 'aaa','bbb','ccc'
     const target_user_list = [
-        '斋藤酸菜','in_kashgar','骑桶人','于三羊鲜声','韩松落','t0mbkeeper','宝玉xp','纽太普同学','petriv','严锋','电子骑士',
-        '何夕','铁拳社','凤凰网科技','人类幻觉体验师','LLS_莉莉丝','女童保护','留几手','汪有','凌太来了','同位素氢','_张大可','向小田',
-        '卢诗翰','高质男','不太安静','现充真实幸福的三次元退休日记本','姚广孝_wayne','徐大小越','新浪读书','樊建川','少数派sspai','东东枪','黃執中','宝树',
-        '新京报书评周刊','ThreeQ_','复旦经院陈硕','剑桥大学出版社学术出版','王之介一','地球镜头Aa','俄罗斯卫星通讯社','残酷的动物们','人民视频','克宫猫砂盆',
-        '海闻看中美','黑尾鸥1988','亞洲風李兆良','潘金莲日记','聂辉华','互联网的那点事','弦子与她的朋友们','牙晓_算命的','三思逍遥','抗战直播','补果君',
-        '牛叔','卢克文','大湾区经视','正观视频','文史书坊','傅蔚冈','侠哥说','痴史','互联网新闻网','电商之家','有限次重复博弈','弱智吧官微','今何在','UCG一刀','毒舌电影',
-        '黑哥在日本','微博会员','中国日报','蒋胜男','历史上的今天_','午夜骑手毛冬','神气飞天猪'
+        '上帝之鹰_5zn','地瓜熊老六','理记','拆台CT','周小平同志','地球镜头A','胡锡进','万能的大熊','烧伤超人阿宝','冬亚','史老柒','一个敢于面对的勇者','盖世英雄玉椒龙','卢诗翰','军武季','沉默的山羊',
+        '飞扬南石','红隼防务Blood-Wing','军武大伊万','王虎的舰桥','勇往直前FA岚熙',''
     ]
-    const MY_COOKIE = 'SINAGLOBAL=8765918787681.666.1689154357659; UOR=,,m.weibo.cn; XSRF-TOKEN=pupWbUjhsfUmsJCqG_nDeqPw; SSOLoginState=1690090739; _s_tentry=weibo.com; Apache=6485790248763.921.1690509675300; ULV=1690509675301:4:4:1:6485790248763.921.1690509675300:1689696615647; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WhmgvI9xO9S_p.Or.4KMFxD5JpX5KMhUgL.Fo2ceo.NeKzXeKe2dJLoI79GTHifMcnt; ALF=1693109162; SCF=AjjcdpeELlnqz1AKLcHdvf6NnZXFbXapwnMquFuZvR9nIr0vWVXmMyJJ7DvONdyWfVxfcWmGvJG7CcQSZc36rKw.; SUB=_2A25Jx076DeRhGedI6VsW8SzIyj-IHXVqtScyrDV8PUNbmtAGLXalkW9NV4tWcFNHCcd-Y5YHB-uE4QpD9CCUWd6Z; WBPSESS=l3MiMUZR4LzyCbrI5ETXI4-IxU5Dl42v5FC4_HISxwUiHNnjB18vV7ALg3eRp1WrJo-LWUphB1-PmzgrtaJ1O7b6rjzVUp5OKDK3T1NdcAO_fvCpOnxuYkM1sk4tCntvPzevgHHfLShyV3wbrWmisA=='
+    // 填写 cookie。  chrome 用户按F12即可查看
+    const MY_COOKIE = 'SINAGLOBAL=8765918787681.666.1689154357659; UOR=,,m.weibo.cn; XSRF-TOKEN=pupWbUjhsfUmsJCqG_nDeqPw; SSOLoginState=1690090739; _s_tentry=weibo.com; Apache=6485790248763.921.1690509675300; ULV=1690509675301:4:4:1:6485790248763.921.1690509675300:1689696615647; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WhmgvI9xO9S_p.Or.4KMFxD5JpX5KMhUgL.Fo2ceo.NeKzXeKe2dJLoI79GTHifMcnt; ALF=1693109162; SCF=AjjcdpeELlnqz1AKLcHdvf6NnZXFbXapwnMquFuZvR9nIr0vWVXmMyJJ7DvONdyWfVxfcWmGvJG7CcQSZc36rKw.; SUB=_2A25Jx076DeRhGedI6VsW8SzIyj-IHXVqtScyrDV8PUNbmtAGLXalkW9NV4tWcFNHCcd-Y5YHB-uE4QpD9CCUWd6Z; WBPSESS=l3MiMUZR4LzyCbrI5ETXI4-IxU5Dl42v5FC4_HISxwUiHNnjB18vV7ALg3eRp1WrJo-LWUphB1-PmzgrtaJ1OxS-U8VUTQXhpLeEzoAJWQrmd2ztQr5B7CzvIt9zssQl90BUC6qs2gbmS73rN7VE5A=='
 
     // 已经搜索过的用户缓存数据
     let searched_user_cach = []
@@ -50,7 +47,7 @@
 
         let popCard = mutation.target
         let nameCard = popCard.childNodes[0].childNodes[0].childNodes[2].childNodes[1]
-        let hrefCard = popCard.childNodes[0].childNodes[1].childNodes[0].childNodes[2].childNodes[1]
+        let hrefCard = popCard.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[1]
         let username = nameCard.innerText
         let href = hrefCard.href
         // 获得uid
