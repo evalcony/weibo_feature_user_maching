@@ -16,10 +16,11 @@
     // 例如 'aaa','bbb','ccc'
     const target_user_list = [
         '上帝之鹰_5zn','地瓜熊老六','理记','拆台CT','周小平同志','地球镜头A','胡锡进','万能的大熊','烧伤超人阿宝','冬亚','史老柒','一个敢于面对的勇者','盖世英雄玉椒龙','卢诗翰','军武季','沉默的山羊',
-        '飞扬南石','红隼防务Blood-Wing','军武大伊万','王虎的舰桥','勇往直前FA岚熙',''
+        '飞扬南石','红隼防务Blood-Wing','军武大伊万','王虎的舰桥','勇往直前FA岚熙','戴雨潇Dai','军武菌','丧心病狂刘老湿','洋务先驱张之洞','止谣君','战甲装研菌','棉花絮飞','蜗牛柯基','包容万物恒河水',
+        '专业戳轮胎熊律师','司马南','伊利达雷之怒','sven_shi','何夕','子午侠士','Creamy蕉','无心剪影','帝吧官微','别梦依稀笑逝川','西西厮福','徐记观察'
     ]
     // 填写 cookie。  chrome 用户按F12即可查看
-    const MY_COOKIE = 'SINAGLOBAL=8765918787681.666.1689154357659; UOR=,,m.weibo.cn; XSRF-TOKEN=pupWbUjhsfUmsJCqG_nDeqPw; SSOLoginState=1690090739; _s_tentry=weibo.com; Apache=6485790248763.921.1690509675300; ULV=1690509675301:4:4:1:6485790248763.921.1690509675300:1689696615647; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WhmgvI9xO9S_p.Or.4KMFxD5JpX5KMhUgL.Fo2ceo.NeKzXeKe2dJLoI79GTHifMcnt; ALF=1693109162; SCF=AjjcdpeELlnqz1AKLcHdvf6NnZXFbXapwnMquFuZvR9nIr0vWVXmMyJJ7DvONdyWfVxfcWmGvJG7CcQSZc36rKw.; SUB=_2A25Jx076DeRhGedI6VsW8SzIyj-IHXVqtScyrDV8PUNbmtAGLXalkW9NV4tWcFNHCcd-Y5YHB-uE4QpD9CCUWd6Z; WBPSESS=l3MiMUZR4LzyCbrI5ETXI4-IxU5Dl42v5FC4_HISxwUiHNnjB18vV7ALg3eRp1WrJo-LWUphB1-PmzgrtaJ1OxS-U8VUTQXhpLeEzoAJWQrmd2ztQr5B7CzvIt9zssQl90BUC6qs2gbmS73rN7VE5A=='
+    const MY_COOKIE = '你的微博cookie'
 
     // 已经搜索过的用户缓存数据
     let searched_user_cach = []
@@ -135,7 +136,7 @@ function cached(name) {
 // 同步请求数据
 async function async_fetch(uid, page_num) {
     var myHeaders = new Headers();
-    myHeaders.append('Cookie', 'SINAGLOBAL=8765918787681.666.1689154357659; UOR=,,m.weibo.cn; XSRF-TOKEN=pupWbUjhsfUmsJCqG_nDeqPw; SSOLoginState=1690090739; _s_tentry=weibo.com; Apache=6485790248763.921.1690509675300; ULV=1690509675301:4:4:1:6485790248763.921.1690509675300:1689696615647; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WhmgvI9xO9S_p.Or.4KMFxD5JpX5KMhUgL.Fo2ceo.NeKzXeKe2dJLoI79GTHifMcnt; ALF=1693109162; SCF=AjjcdpeELlnqz1AKLcHdvf6NnZXFbXapwnMquFuZvR9nIr0vWVXmMyJJ7DvONdyWfVxfcWmGvJG7CcQSZc36rKw.; SUB=_2A25Jx076DeRhGedI6VsW8SzIyj-IHXVqtScyrDV8PUNbmtAGLXalkW9NV4tWcFNHCcd-Y5YHB-uE4QpD9CCUWd6Z; WBPSESS=l3MiMUZR4LzyCbrI5ETXI4-IxU5Dl42v5FC4_HISxwUiHNnjB18vV7ALg3eRp1WrJo-LWUphB1-PmzgrtaJ1O7b6rjzVUp5OKDK3T1NdcAO_fvCpOnxuYkM1sk4tCntvPzevgHHfLShyV3wbrWmisA=='); // 设置Cookie
+    myHeaders.append('Cookie', MY_COOKIE); // 设置Cookie
     myHeaders.append("Referer", "https://m.weibo.cn/");
     myHeaders.append("Sec-Fetch-Mode", "cors");
     myHeaders.append("Accept", "application/json, text/plain, */*");
