@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         你果然关注了这些人（微博特征用户关注检测）
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  新浪微博，查看用户关注「典型」用户的数量。一个常见的应用场景就是看ta关注了哪些你会拉黑的人。
 // @author       evalcony
 // @homepageURL  https://github.com/evalcony/weibo_feature_user_maching
@@ -82,7 +82,7 @@ function getUserId(href) {
     let l = href.indexOf('follow/')
     let r = href.indexOf('?')
     let text = href.substring(l+'follow/'.length, r)
-    console.log(text)
+    // console.log(text)
     return text
 }
 
@@ -90,9 +90,8 @@ function makeFocusDiv(name) {
 
     // 获取缓存的命中user数量
     let cachedPos = cached(name)
-    console.log('cachedPos = ' + cachedPos)
-    console.log(searched_user_cach)
-    console.log(searched_user_target_match_num_cache)
+    // console.log(searched_user_cach)
+    // console.log(searched_user_target_match_num_cache)
     let num = 0
     if (cachedPos != -1) {
         num = searched_user_target_match_num_cache[cachedPos]
@@ -110,7 +109,6 @@ function makeFocusDiv(name) {
 async function search(uid, name) {
     if (cached(name) != -1) {
         // do cached job
-
         return
     }
 
@@ -118,7 +116,6 @@ async function search(uid, name) {
     Atomics.store(total_match_num, 0, 0); // 原子写入
     for (var i = 1; i <= max_page; i++) {
         await async_fetch(uid, i)
-        console.log(i)
     }
     console.log("查询结果：" + name + "_" + Atomics.load(total_match_num, 0))
 
@@ -155,7 +152,6 @@ async function async_fetch(uid, page_num) {
 
     var url = 'https://weibo.com/ajax/friendships/friends?page=${page_num}&uid=${uid}'
     url = url.replace('${page_num}', page_num).replace('${uid}', uid);
-    //console.log(url)
 
     await fetch(url, requestOptions)
         .then(response => response.text())
@@ -175,6 +171,7 @@ async function fetchPromise(result) {
 
 // 数据解析
 function friendsDataSolver(result) {
+    console.log('数据解析')
     const parsedData = JSON.parse(result);
     // 设置最大页数
     let total_number = parsedData.total_number
@@ -189,7 +186,7 @@ function friendsDataSolver(result) {
         let f = isInTargetUserList(u.screen_name)
         //console.log(f + ' ' + u.screen_name)
         if (f) {
-            //console.log(f + ' ' + u.screen_name)
+            console.log(f + ' ' + u.screen_name)
             Atomics.add(total_match_num, 0, 1)
         }
     }
