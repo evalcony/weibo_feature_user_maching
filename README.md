@@ -6,4 +6,4 @@
 
 ![](/images/pic2.png)
 
-![](/images/pic3.png)
+![](/images/pic4.png)
