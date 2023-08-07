@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         你果然关注了这些人（微博特征用户关注检测）
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.4.1
 // @description  新浪微博，查看用户关注「典型」用户的数量。一个常见的应用场景就是看ta关注了哪些你会拉黑的人。
 // @author       evalcony
 // @homepageURL  https://github.com/evalcony/weibo_feature_user_maching
@@ -21,7 +21,8 @@
         '飞扬南石','红隼防务Blood-Wing','军武大伊万','王虎的舰桥','勇往直前FA岚熙','戴雨潇Dai','军武菌','丧心病狂刘老湿','洋务先驱张之洞','止谣君','战甲装研菌','棉花絮飞','蜗牛柯基','包容万物恒河水',
         '专业戳轮胎熊律师','何夕','司马南','作家陈岚','伊利达雷之怒','sven_shi','子午侠士','Creamy蕉','无心剪影','帝吧官微','别梦依稀笑逝川','西西厮福','徐记观察','宝蓝色的独角仙','南海的浪涛',
         '飞象网项立刚','王孟源dudu','呱呱傻事','应用技术联合体','lfx160219','天真卖萌Bernard','台湾傻事','宋晓军','宋忠平','地球镜头Aa','棉花絮飞','沙姆猎鹰_EL','大象驮蜗牛','鹅毛毛丹尼尔','戈洛夫杨',
-        '观察者网','共青团中央','环球时报','环球时报-英文版','风云学会陈经','唐哲同学','纯洁善良潘帕斯','平原公子赵胜','李爷无为','平民王小石','记者韩鹏','后沙月光本尊','思想火炬'
+        '观察者网','共青团中央','环球时报','环球时报-英文版','风云学会陈经','唐哲同学','纯洁善良潘帕斯','平原公子赵胜','李爷无为','平民王小石','记者韩鹏','后沙月光本尊','思想火炬','紫光阁','紫网在线',
+        '红旗文稿','千钧客','星炬网','军事博主','占豪','司马平邦','一个院长的思考','侠骨柔情的杨华',,'HW前HR'
     ]
 
 
@@ -111,7 +112,7 @@ function makeFocusDiv(name) {
     if (focus_list_forbid) {
         div.textContent = '只有粉丝才能查看关注列表'
     } else {
-        div.textContent = '命中特征用户数量：' + num
+        div.textContent = num
     }
     return div
 }
@@ -133,8 +134,13 @@ async function search(uid, name) {
     }
     console.log("查询结果：" + name + "_" + Atomics.load(total_match_num, 0))
 
-    searched_user_cach.push(name)
-    searched_user_target_match_num_cache.push(Atomics.load(total_match_num, 0))
+    if (focus_list_forbid) {
+        searched_user_cach.push(name)
+        searched_user_target_match_num_cache.push('只有粉丝才能查看关注列表')
+    } else {
+        searched_user_cach.push(name)
+        searched_user_target_match_num_cache.push('命中特征用户数量：' + Atomics.load(total_match_num, 0))
+    }
 }
 
 // 查找缓存数组的下标
