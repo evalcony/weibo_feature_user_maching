@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         你果然关注了这些人（微博特征用户关注检测）
 // @namespace    http://tampermonkey.net/
-// @version      0.4.1
+// @version      0.5
 // @description  新浪微博，查看用户关注「典型」用户的数量。一个常见的应用场景就是看ta关注了哪些你会拉黑的人。
 // @author       evalcony
 // @homepageURL  https://github.com/evalcony/weibo_feature_user_maching
@@ -37,12 +37,17 @@
     let searched_user_cach = []
     // 用户关注的 target_user_list 命中数
     let searched_user_target_match_num_cache = []
+    // 用户关注的具体 target_user
+    let searched_user_target_match_user_cache = new Map();
 
     // 最大查询分页数 <= 11 (11是微博设置的查看上限)
     let max_page = 5
     // 命中数
     const buf = new ArrayBuffer(4);
     const total_match_num = new Int32Array(buf);
+
+    // 命中的 user_list
+    let match_user_list = []
 
     let showFlag = 0
 
@@ -54,6 +59,7 @@
         if (showFlag % 2 == 0) {
             // 移除
             document.querySelector('#my_div').remove()
+            document.querySelector('#my_focus_user_div').remove()
             return
         }
 
@@ -64,7 +70,7 @@
         let href = hrefCard.href
         // 获得uid
         let uid = getUserId(href)
-        console.log(href)
+        // console.log(href)
         console.log(username)
 
         search(uid, username)
@@ -77,12 +83,15 @@
         //subtree: true,
     });
 
-    console.log(Atomics.load(total_match_num, 0))
+    // console.log(Atomics.load(total_match_num, 0))
 
 
 function flushEle(popCard, name) {
     let div = makeFocusDiv(name)
     popCard.appendChild(div)
+
+    let div_user_list = makeFocusUserListDiv(name)
+    popCard.appendChild(div_user_list)
 }
 
 function getUserId(href) {
@@ -90,7 +99,6 @@ function getUserId(href) {
     let l = href.indexOf('follow/')
     let r = href.indexOf('?')
     let text = href.substring(l+'follow/'.length, r)
-    console.log(text)
     return text
 }
 
@@ -117,6 +125,29 @@ function makeFocusDiv(name) {
     return div
 }
 
+function makeFocusUserListDiv(name) {
+    let div = document.createElement('div');
+    div.id = 'my_focus_user_div'
+
+    let user_list = ''
+    let cachedPos = cached(name)
+    if (cachedPos != -1) {
+        let u_list = searched_user_target_match_user_cache.get(name)
+        if (u_list.length > 0) {
+
+            u_list.forEach(item => {
+                const p = document.createElement('p');
+                p.textContent = item;
+                div.appendChild(p); 
+            });
+        }
+    } else {
+
+    }
+    // div.textContent = user_list
+    return div
+}
+
 // 查询用户关注列表
 async function search(uid, name) {
     if (cached(name) != -1) {
@@ -126,6 +157,9 @@ async function search(uid, name) {
     }
 
     focus_list_forbid = false
+
+    // 初始化
+    match_user_list = []
 
     // 遍历关注列表
     Atomics.store(total_match_num, 0, 0); // 原子写入
@@ -137,9 +171,11 @@ async function search(uid, name) {
     if (focus_list_forbid) {
         searched_user_cach.push(name)
         searched_user_target_match_num_cache.push('只有粉丝才能查看关注列表')
+        searched_user_target_match_user_cache.set(name, [])
     } else {
         searched_user_cach.push(name)
         searched_user_target_match_num_cache.push('命中特征用户数量：' + Atomics.load(total_match_num, 0))
+        searched_user_target_match_user_cache.set(name, match_user_list)
     }
 }
 
@@ -177,7 +213,6 @@ async function async_fetch(uid, page_num) {
 
     var url = 'https://weibo.com/ajax/friendships/friends?page=${page_num}&uid=${uid}'
     url = url.replace('${page_num}', page_num).replace('${uid}', uid);
-    //console.log(url)
 
     await fetch(url, requestOptions)
         .then(response => response.text())
@@ -215,6 +250,7 @@ function friendsDataSolver(result) {
         if (f) {
             console.log(f + ' ' + u.screen_name)
             Atomics.add(total_match_num, 0, 1)
+            match_user_list.push(u.screen_name)
         }
     }
 }
