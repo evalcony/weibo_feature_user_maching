@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         你果然关注了这些人（微博特征用户关注检测）
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  新浪微博，查看用户关注「典型」用户的数量。一个常见的应用场景就是看ta关注了哪些你会拉黑的人。
 // @author       evalcony
 // @homepageURL  https://github.com/evalcony/weibo_feature_user_maching
@@ -19,11 +19,18 @@
     const target_user_list = [
         '上帝之鹰_5zn','地瓜熊老六','理记','拆台CT','周小平同志','地球镜头A','胡锡进','万能的大熊','烧伤超人阿宝','冬亚','史老柒','一个敢于面对的勇者','盖世英雄玉椒龙','卢诗翰','军武季','沉默的山羊',
         '飞扬南石','红隼防务Blood-Wing','军武大伊万','王虎的舰桥','勇往直前FA岚熙','戴雨潇Dai','军武菌','丧心病狂刘老湿','洋务先驱张之洞','止谣君','战甲装研菌','棉花絮飞','蜗牛柯基','包容万物恒河水',
-        '专业戳轮胎熊律师','司马南','伊利达雷之怒','sven_shi','何夕','子午侠士','Creamy蕉','无心剪影','帝吧官微','别梦依稀笑逝川','西西厮福','徐记观察'
+        '专业戳轮胎熊律师','何夕','司马南','作家陈岚','伊利达雷之怒','sven_shi','子午侠士','Creamy蕉','无心剪影','帝吧官微','别梦依稀笑逝川','西西厮福','徐记观察','宝蓝色的独角仙','南海的浪涛',
+        '飞象网项立刚','王孟源dudu','呱呱傻事','应用技术联合体','lfx160219','天真卖萌Bernard','台湾傻事','宋晓军','宋忠平','地球镜头Aa','棉花絮飞','沙姆猎鹰_EL','大象驮蜗牛','鹅毛毛丹尼尔','戈洛夫杨',
+        '观察者网','共青团中央','环球时报','环球时报-英文版','风云学会陈经','唐哲同学','纯洁善良潘帕斯','平原公子赵胜','李爷无为','平民王小石','记者韩鹏','后沙月光本尊','思想火炬'
     ]
 
 
+    // ----------------------------------------------------------------------------------------
+
     const MY_COOKIE = document.cookie
+
+    // 用户关注列表是否被禁止查看
+    let focus_list_forbid = false
 
     // 已经搜索过的用户缓存数据
     let searched_user_cach = []
@@ -82,7 +89,7 @@ function getUserId(href) {
     let l = href.indexOf('follow/')
     let r = href.indexOf('?')
     let text = href.substring(l+'follow/'.length, r)
-    // console.log(text)
+    console.log(text)
     return text
 }
 
@@ -90,8 +97,8 @@ function makeFocusDiv(name) {
 
     // 获取缓存的命中user数量
     let cachedPos = cached(name)
-    // console.log(searched_user_cach)
-    // console.log(searched_user_target_match_num_cache)
+    console.log(searched_user_cach)
+    console.log(searched_user_target_match_num_cache)
     let num = 0
     if (cachedPos != -1) {
         num = searched_user_target_match_num_cache[cachedPos]
@@ -101,7 +108,11 @@ function makeFocusDiv(name) {
 
     let div = document.createElement('div');
     div.id = 'my_div'
-    div.textContent = '命中特征用户数量：' + num
+    if (focus_list_forbid) {
+        div.textContent = '只有粉丝才能查看关注列表'
+    } else {
+        div.textContent = '命中特征用户数量：' + num
+    }
     return div
 }
 
@@ -109,8 +120,11 @@ function makeFocusDiv(name) {
 async function search(uid, name) {
     if (cached(name) != -1) {
         // do cached job
+
         return
     }
+
+    focus_list_forbid = false
 
     // 遍历关注列表
     Atomics.store(total_match_num, 0, 0); // 原子写入
@@ -135,6 +149,11 @@ function cached(name) {
 
 // 同步请求数据
 async function async_fetch(uid, page_num) {
+
+    if (focus_list_forbid) {
+        return
+    }
+
     var myHeaders = new Headers();
     myHeaders.append('Cookie', MY_COOKIE); // 设置Cookie
     myHeaders.append("Referer", "https://m.weibo.cn/");
@@ -152,6 +171,7 @@ async function async_fetch(uid, page_num) {
 
     var url = 'https://weibo.com/ajax/friendships/friends?page=${page_num}&uid=${uid}'
     url = url.replace('${page_num}', page_num).replace('${uid}', uid);
+    //console.log(url)
 
     await fetch(url, requestOptions)
         .then(response => response.text())
@@ -163,6 +183,7 @@ async function fetchPromise(result) {
     var r = result.indexOf('博主设置仅针对粉丝展示全部关注')
     if (r != -1) {
         console.log('博主设置仅针对粉丝展示全部关注')
+        focus_list_forbid = true
         return
     }
     friendsDataSolver(result)
@@ -171,7 +192,7 @@ async function fetchPromise(result) {
 
 // 数据解析
 function friendsDataSolver(result) {
-    console.log('数据解析')
+    console.log('网络请求')
     const parsedData = JSON.parse(result);
     // 设置最大页数
     let total_number = parsedData.total_number
